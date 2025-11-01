@@ -1,0 +1,66 @@
+name: Build and Upload Binaries
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  build:
+    name: ${{ matrix.platform.target }}
+    runs-on: ${{ matrix.platform.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          # linux gnu targets
+          - target: x86_64-unknown-linux-gnu
+            runs-on: ubuntu-latest
+          - target: aarch64-unknown-linux-gnu
+            runs-on: ubuntu-latest
+          - target: i686-unknown-linux-gnu
+            runs-on: ubuntu-latest
+          - target: armv7-unknown-linux-gnueabihf
+            runs-on: ubuntu-latest
+          # linux musl targets
+          - target: x86_64-unknown-linux-musl
+            runs-on: ubuntu-latest
+          - target: aarch64-unknown-linux-musl
+            runs-on: ubuntu-latest
+          - target: i686-unknown-linux-musl
+            runs-on: ubuntu-latest
+          - target: armv7-unknown-linux-musleabihf
+            runs-on: ubuntu-latest
+          # windows targets
+          - target: x86_64-pc-windows-gnu
+            runs-on: windows-latest
+          ##- target: i686-pc-windows-gnu
+          ##  runs-on: windows-latest           # error: linker `i686-w64-mingw32-gcc` not found
+          # macOS targets
+          - target: x86_64-apple-darwin
+            runs-on: macos-latest
+          - target: aarch64-apple-darwin
+            runs-on: macos-latest
+        toolchain:
+          - stable
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      - name: Build binary
+        uses: houseabsolute/actions-rust-cross@v1
+        with:
+          command: "build"
+          target: ${{ matrix.platform.target }}
+          args: "--locked --release"
+          strip: true
+      - name: Test binary
+        uses: houseabsolute/actions-rust-cross@v1
+        with:
+          command: "run"
+          target: ${{ matrix.platform.target }}
+          args: "--locked --release -- -n 96 -i 3"
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nanoda-${{ matrix.platform.target }}
+          path: target/${{ matrix.platform.target }}/release/nanoda
