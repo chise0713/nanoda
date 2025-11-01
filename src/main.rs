@@ -9,6 +9,10 @@ const ITER: usize = 10_000_000;
 
 const EXIT_TOO_LARGE: u8 = 2;
 
+const CARGO_PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
+const GIT_DESCRIBE: &str = env!("VERGEN_GIT_DESCRIBE");
+const TARGET_TRIPLE: &str = env!("VERGEN_CARGO_TARGET_TRIPLE");
+
 #[derive(supershorty::Args, Debug)]
 #[args(name = "nanoda", allow_no_args = true)]
 struct Args {
@@ -55,14 +59,17 @@ fn main() -> ExitCode {
     }
     let iterations = iterations as usize;
 
-    println!(
-        "nanoda version:\t{}\nplatform:\t{}\narchitecture:\t{}\nmemory size:\t{} MiB, test iterations {}",
-        env!("CARGO_PKG_VERSION"),
-        env::consts::OS,
-        env::consts::ARCH,
-        memory_size_orig,
-        iterations
-    );
+    {
+        let version = if GIT_DESCRIBE == "VERGEN_IDEMPOTENT_OUTPUT" {
+            format!("v{} (cargo)", CARGO_PKG_VERSION)
+        } else {
+            format!("{} (git)\tv{} (cargo)", GIT_DESCRIBE, CARGO_PKG_VERSION)
+        };
+        println!(
+            "nanoda version:\t{}\nbuild target:\t{}\nmemory size:\t{} MiB, test iterations {}",
+            version, TARGET_TRIPLE, memory_size_orig, iterations
+        );
+    }
 
     let mut data: Box<[usize]> = unsafe { Box::new_uninit_slice(memory_size).assume_init() };
     let base = data.as_ptr();

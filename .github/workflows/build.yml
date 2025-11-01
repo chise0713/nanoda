@@ -1,8 +1,14 @@
 name: Build and Upload Binaries
 on:
   push:
+    paths:
+      - "**/src/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/build.yml"
     branches:
       - "**"
+  workflow_call:
   pull_request:
 
 jobs:
