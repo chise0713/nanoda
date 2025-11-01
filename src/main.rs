@@ -25,6 +25,7 @@ fn permute(i: usize, n: usize) -> usize {
 }
 
 #[cfg(target_pointer_width = "32")]
+#[inline(always)]
 fn permute(i: usize, n: usize) -> usize {
     (i.wrapping_mul(1664525).wrapping_add(1013904223)) & (n - 1)
 }
