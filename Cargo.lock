@@ -760,6 +760,7 @@ dependencies = [
  "derive_builder",
  "regex",
  "rustversion",
+ "time",
  "vergen-lib",
 ]
 

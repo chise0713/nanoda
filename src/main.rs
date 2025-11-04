@@ -10,9 +10,12 @@ const ITER: usize = 10_000_000;
 
 const EXIT_TOO_LARGE: u8 = 2;
 
+const UNKNOWN: &str = "unknown";
+const BUILD_TIMESTAMP: &str = env!("VERGEN_BUILD_TIMESTAMP");
 const CARGO_PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
 const TARGET_TRIPLE: &str = env!("VERGEN_CARGO_TARGET_TRIPLE");
 const GIT_DESCRIBE: &str = env!("VERGEN_GIT_DESCRIBE");
+const GIT_SHA: &str = env!("VERGEN_GIT_SHA");
 
 #[cfg(target_pointer_width = "64")]
 const PTR_SIZE: usize = 8;
@@ -20,6 +23,10 @@ const PTR_SIZE: usize = 8;
 const PTR_SIZE: usize = 4;
 
 const MB: usize = 1024 * 1024;
+#[cfg(target_pointer_width = "64")]
+const MAX_REGION_SIZE: u64 = 4096;
+#[cfg(target_pointer_width = "32")]
+const MAX_REGION_SIZE: u64 = 1024;
 
 #[derive(supershorty::Args, Debug)]
 #[args(name = "nanoda", allow_no_args = true)]
@@ -28,6 +35,8 @@ struct Args {
     memory_size: Option<u64>,
     #[arg(flag = 'i', help = "test iterations")]
     iterations: Option<u64>,
+    #[arg(flag = 'b', help = "show build message")]
+    build_info: bool,
 }
 
 struct ChaseSeq(Box<[usize]>);
@@ -68,6 +77,30 @@ impl DerefMut for ChaseSeq {
     }
 }
 
+fn build_info() {
+    version_info();
+    println!(
+        "{:<20} {}",
+        "commit sha2 hash:",
+        (GIT_SHA == "VERGEN_IDEMPOTENT_OUTPUT")
+            .then(|| UNKNOWN)
+            .unwrap_or(GIT_SHA)
+    );
+    println!("{:<20} {}", "build timestamp:", BUILD_TIMESTAMP);
+}
+
+fn version_info() {
+    println!(
+        "{:<20} v{} (cargo), {} (git)",
+        "nanoda version:",
+        CARGO_PKG_VERSION,
+        (GIT_DESCRIBE == "VERGEN_IDEMPOTENT_OUTPUT")
+            .then(|| UNKNOWN)
+            .unwrap_or(GIT_DESCRIBE),
+    );
+    println!("{:<20} {}", "build target:", TARGET_TRIPLE,);
+}
+
 fn main() -> ExitCode {
     let args = match Args::parse() {
         Ok(v) => v,
@@ -75,35 +108,32 @@ fn main() -> ExitCode {
             return e;
         }
     };
+    if args.build_info {
+        build_info();
+        return ExitCode::SUCCESS;
+    }
 
     if args.memory_size.is_none() || args.iterations.is_none() {
         Args::usage();
         return ExitCode::FAILURE;
     }
     let n_mb = args.memory_size.unwrap();
-    if n_mb > (usize::MAX / (PTR_SIZE * MB)) as u64 {
+    if n_mb > MAX_REGION_SIZE {
         eprintln!("`n` is too large");
         return ExitCode::from(EXIT_TOO_LARGE);
     }
     let memory_size = n_mb as usize * MB / PTR_SIZE;
     let iterations = args.iterations.unwrap();
-    if iterations > usize::MAX as u64 {
+    if iterations > u16::MAX as u64 {
         eprintln!("`i` is too large");
         return ExitCode::from(EXIT_TOO_LARGE);
     }
     let iterations = iterations as usize;
 
+    version_info();
     println!(
-        "nanoda version:\tv{} (cargo), {} (git)\nbuild target:\t{}\nmemory size:\t{} MiB, test iterations {}",
-        CARGO_PKG_VERSION,
-        if GIT_DESCRIBE == "VERGEN_IDEMPOTENT_OUTPUT" {
-            "unknown"
-        } else {
-            GIT_DESCRIBE
-        },
-        TARGET_TRIPLE,
-        n_mb,
-        iterations
+        "{:<20} {} MiB, test iterations {}",
+        "memory size:", n_mb, iterations
     );
 
     let data = ChaseSeq::new(memory_size);

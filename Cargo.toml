@@ -8,4 +8,4 @@ quanta = "0.12.6"
 supershorty = "0.2.1"
 
 [build-dependencies]
-vergen-git2 = { version = "1.0.7", features = ["cargo"] }
+vergen-git2 = { version = "1.0.7", features = ["build", "cargo"] }
