@@ -1,5 +1,6 @@
 use std::{
     env, hint,
+    ops::{Deref, DerefMut},
     process::ExitCode,
     ptr,
     sync::atomic::{Ordering, compiler_fence},
@@ -29,16 +30,42 @@ struct Args {
     iterations: Option<u64>,
 }
 
-#[cfg(target_pointer_width = "64")]
-#[inline(always)]
-fn permute(i: usize, n: usize) -> usize {
-    (i.wrapping_mul(6364136223846793005).wrapping_add(1)) & (n - 1)
+struct ChaseSeq(Box<[usize]>);
+
+impl ChaseSeq {
+    #[cfg(target_pointer_width = "64")]
+    #[inline(always)]
+    fn permute(i: usize, n: usize) -> usize {
+        (i.wrapping_mul(6364136223846793005).wrapping_add(1)) & (n - 1)
+    }
+
+    #[cfg(target_pointer_width = "32")]
+    #[inline(always)]
+    fn permute(i: usize, n: usize) -> usize {
+        (i.wrapping_mul(1664525).wrapping_add(1013904223)) & (n - 1)
+    }
+
+    fn new(size: usize) -> Self {
+        let mut data = Box::new_uninit_slice(size);
+        for (i, slot) in data.iter_mut().enumerate() {
+            slot.write(Self::permute(i + 1, size));
+        }
+        let data = unsafe { data.assume_init() }; // safe because all elements are initialized
+        ChaseSeq(data)
+    }
 }
 
-#[cfg(target_pointer_width = "32")]
-#[inline(always)]
-fn permute(i: usize, n: usize) -> usize {
-    (i.wrapping_mul(1664525).wrapping_add(1013904223)) & (n - 1)
+impl Deref for ChaseSeq {
+    type Target = [usize];
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for ChaseSeq {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
 }
 
 fn main() -> ExitCode {
@@ -79,27 +106,28 @@ fn main() -> ExitCode {
         iterations
     );
 
-    let mut data = Box::new_uninit_slice(memory_size);
-    for i in 0..memory_size {
-        data[i].write(permute(i + 1, memory_size));
-    }
-    let data = unsafe { data.assume_init() };
+    let data = ChaseSeq::new(memory_size);
     let base = data.as_ptr();
+    // unintialize results array, you should not read before written
     let mut results = Box::new_uninit_slice(iterations);
     let clock = quanta::Clock::new();
-    for r in 0..iterations {
+    for (r, slot) in results.iter_mut().enumerate() {
         let mut p = r;
         let t0 = clock.now();
-        for _ in 0..ITER {
+        for _ in 0..(ITER.min(memory_size)) {
             p = unsafe { ptr::read_volatile(base.add(p)) };
             compiler_fence(Ordering::SeqCst);
         }
         let dt = t0.elapsed().as_secs_f64() * 1e9 / ITER as f64;
-        results[r].write(dt);
+        slot.write(dt);
         hint::black_box(p);
     }
-
+    // when you making changes,
+    // always check results are fully initialized before reading.
+    // do not move the `results.iter_mut().enumerate()` loop
+    // below the `results.assume_init()`, never ever do that.
     let results = unsafe { results.assume_init() };
+
     let min = results.iter().copied().reduce(f64::min).unwrap();
     let max = results.iter().copied().reduce(f64::max).unwrap();
     print!("\nresults:\nmin = {min:.3} ns, max = {max:.3} ns");
