@@ -11,6 +11,9 @@ on:
   workflow_call:
   pull_request:
 
+env:
+  GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
 jobs:
   build:
     name: ${{ matrix.platform.target }}
@@ -52,6 +55,8 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          fetch-depth: 0
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v1
         with:

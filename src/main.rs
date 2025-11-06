@@ -16,6 +16,7 @@ const CARGO_PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
 const TARGET_TRIPLE: &str = env!("VERGEN_CARGO_TARGET_TRIPLE");
 const GIT_DESCRIBE: &str = env!("VERGEN_GIT_DESCRIBE");
 const GIT_SHA: &str = env!("VERGEN_GIT_SHA");
+const GITHUB_RUN_URL: Option<&str> = option_env!("GITHUB_RUN_URL");
 
 #[cfg(target_pointer_width = "64")]
 const PTR_SIZE: usize = 8;
@@ -87,6 +88,11 @@ fn build_info() {
             .unwrap_or(GIT_SHA)
     );
     println!("{:<20} {}", "build timestamp:", BUILD_TIMESTAMP);
+    let url = GITHUB_RUN_URL.unwrap_or(UNKNOWN);
+    println!("{:<20} {}", "builder logs url:", url);
+    println!(
+        "only same binary gives comparable benchmark, so please note the above info and checksum."
+    );
 }
 
 fn version_info() {
@@ -110,10 +116,14 @@ fn main() -> ExitCode {
     };
     if args.build_info {
         build_info();
-        return ExitCode::SUCCESS;
+    } else {
+        version_info();
     }
 
     if args.memory_size.is_none() || args.iterations.is_none() {
+        if args.build_info {
+            return ExitCode::SUCCESS;
+        }
         Args::usage();
         return ExitCode::FAILURE;
     }
@@ -130,7 +140,6 @@ fn main() -> ExitCode {
     }
     let iterations = iterations as usize;
 
-    version_info();
     println!(
         "{:<20} {} MiB, test iterations {}",
         "memory size:", n_mb, iterations
