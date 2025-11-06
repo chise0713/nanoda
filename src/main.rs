@@ -116,10 +116,14 @@ fn main() -> ExitCode {
     };
     if args.build_info {
         build_info();
-        return ExitCode::SUCCESS;
+    } else {
+        version_info();
     }
 
     if args.memory_size.is_none() || args.iterations.is_none() {
+        if args.build_info {
+            return ExitCode::SUCCESS;
+        }
         Args::usage();
         return ExitCode::FAILURE;
     }
@@ -136,7 +140,6 @@ fn main() -> ExitCode {
     }
     let iterations = iterations as usize;
 
-    version_info();
     println!(
         "{:<20} {} MiB, test iterations {}",
         "memory size:", n_mb, iterations
