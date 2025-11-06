@@ -88,11 +88,11 @@ fn build_info() {
             .unwrap_or(GIT_SHA)
     );
     println!("{:<20} {}", "build timestamp:", BUILD_TIMESTAMP);
-    if let Some(url) = GITHUB_RUN_URL {
-        println!("{:<20} {}", "builder logs url:", url);
-        println!("you should compare the checksum of this binary with the artifact above.");
-        println!("if they differ, then the results of this benchmark are untrustworthy.");
-    }
+    let url = GITHUB_RUN_URL.unwrap_or(UNKNOWN);
+    println!("{:<20} {}", "builder logs url:", url);
+    println!(
+        "only same binary gives comparable benchmark, so please note the above info and checksum."
+    );
 }
 
 fn version_info() {
