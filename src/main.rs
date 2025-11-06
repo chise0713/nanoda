@@ -16,6 +16,7 @@ const CARGO_PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
 const TARGET_TRIPLE: &str = env!("VERGEN_CARGO_TARGET_TRIPLE");
 const GIT_DESCRIBE: &str = env!("VERGEN_GIT_DESCRIBE");
 const GIT_SHA: &str = env!("VERGEN_GIT_SHA");
+const GITHUB_RUN_URL: Option<&str> = option_env!("GITHUB_RUN_URL");
 
 #[cfg(target_pointer_width = "64")]
 const PTR_SIZE: usize = 8;
@@ -87,6 +88,11 @@ fn build_info() {
             .unwrap_or(GIT_SHA)
     );
     println!("{:<20} {}", "build timestamp:", BUILD_TIMESTAMP);
+    if let Some(url) = GITHUB_RUN_URL {
+        println!("{:<20} {}", "builder logs url:", url);
+        println!("you should compare the checksum of this binary with the artifact above.");
+        println!("if they differ, then the results of this benchmark are untrustworthy.");
+    }
 }
 
 fn version_info() {

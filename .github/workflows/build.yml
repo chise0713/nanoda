@@ -11,6 +11,9 @@ on:
   workflow_call:
   pull_request:
 
+env:
+  GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
 jobs:
   build:
     name: ${{ matrix.platform.target }}
