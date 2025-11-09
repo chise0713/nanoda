@@ -1,0 +1,14 @@
+name: Test Release CI
+
+on:
+  push:
+    paths:
+      - ".github/workflows/release.yml"
+      - ".github/workflows/test_release_ci.yml"
+
+jobs:
+  test:
+    name: Test Release Workflow
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release.yml

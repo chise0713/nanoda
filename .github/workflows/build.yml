@@ -1,4 +1,5 @@
 name: Build and Upload Binaries
+
 on:
   push:
     paths:
