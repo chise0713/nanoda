@@ -3,7 +3,7 @@ name: Build and Upload Binaries
 on:
   push:
     paths:
-      - "**/src/**"
+      - "**/*.rs"
       - "Cargo.toml"
       - "Cargo.lock"
       - ".github/workflows/build.yml"
@@ -70,7 +70,7 @@ jobs:
         with:
           command: "run"
           target: ${{ matrix.platform.target }}
-          args: "--locked --release -- -n 96 -i 3"
+          args: "--locked --release -- -bn 64 -i 3"
       - name: Upload binary artifact
         if: ${{ matrix.platform.runs-on != 'windows-latest' }}
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5

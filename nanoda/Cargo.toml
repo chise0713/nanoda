@@ -1,0 +1,22 @@
+[package]
+name = "nanoda"
+version = "0.2.0"
+edition = "2024"
+authors.workspace = true
+repository.workspace = true
+license = "GPL-3.0-or-later"
+description = "Hey there! nanoda is your go-to Rust tool for benchmarking memory latency."
+categories = ["command-line-utilities"]
+keywords = ["benchmarking", "memory-latency", "pointer-chasing"]
+readme.workspace = true
+
+[[bin]]
+name = "nanoda"
+path = "src/main.rs"
+
+[dependencies]
+chase_seq = { version = "0.1.0", path = "../chase_seq" }
+
+supershorty = "0.2.1"
+[build-dependencies]
+vergen-git2 = { version = "1.0.7", features = ["build", "cargo"] }

@@ -8,7 +8,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .add_instructions(
             &Git2Builder::default()
                 .sha(false)
-                .describe(true, true, None)
+                .describe(true, true, Some("v[0-9]*"))
                 .build()?,
         )?
         .add_instructions(&CargoBuilder::default().target_triple(true).build()?)?

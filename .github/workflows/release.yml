@@ -2,7 +2,8 @@ name: Release the Binaries
 
 on:
   push:
-    tags: ["**"]
+    tags-ignore: ["chase_seq-v*"]
+
   workflow_call:
 
 jobs:
