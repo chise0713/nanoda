@@ -1,6 +1,6 @@
 use std::{env, process::ExitCode};
 
-use chase_seq::{ChaseSeqBuilder, MAX_REGION_SIZE};
+use chase_seq::ChaseSeqBuilder;
 
 const EXIT_ARG: u8 = 2;
 
@@ -11,6 +11,11 @@ const TARGET_TRIPLE: &str = env!("VERGEN_CARGO_TARGET_TRIPLE");
 const GIT_DESCRIBE: &str = env!("VERGEN_GIT_DESCRIBE");
 const GIT_SHA: &str = env!("VERGEN_GIT_SHA");
 const GITHUB_RUN_URL: Option<&str> = option_env!("GITHUB_RUN_URL");
+
+#[cfg(target_pointer_width = "64")]
+const MAX_REGION_SIZE: usize = 4096 * chase_seq::MB;
+#[cfg(target_pointer_width = "32")]
+const MAX_REGION_SIZE: usize = 1024 * chase_seq::MB;
 
 #[derive(supershorty::Args, Debug)]
 #[args(name = "nanoda", allow_no_args = true)]
@@ -67,7 +72,7 @@ fn main() -> ExitCode {
     };
 
     let memory_size = if let Some(n) = args.memory_size {
-        let n = (n * chase_seq::MB as f64 / chase_seq::KB as f64).round() as usize;
+        let n = (n * chase_seq::KB as f64).round() as usize;
         if n == 0 {
             eprintln!("`n` is too small");
             return ExitCode::from(EXIT_ARG);
@@ -117,9 +122,10 @@ fn main() -> ExitCode {
         .size(memory_size)
         .unwrap()
         .fence(false)
+        .seed("zundamon nanoda!!")
         .build()
-        .unwrap()
-        .chase(test_iterations);
+        .chase(test_iterations)
+        .unwrap();
 
     let min = results.iter().copied().reduce(f64::min).unwrap();
     let max = results.iter().copied().reduce(f64::max).unwrap();

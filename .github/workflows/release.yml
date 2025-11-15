@@ -23,8 +23,6 @@ jobs:
           path: ./artifacts
       - name: Rename files
         run: |
-          #!/usr/bin/env bash
-          set -euo pipefail
           src_dir="${{ github.workspace }}/artifacts"
           out_dir="${{ github.workspace }}/out"
           mkdir -p "$out_dir"

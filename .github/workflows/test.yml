@@ -1,25 +1,13 @@
-name: Build and Upload Binaries
+name: Unit Tests
 
 on:
-  push:
-    paths:
-      - "**/*.rs"
-      - "**/Cargo.toml"
-      - "Cargo.lock"
-      - ".github/workflows/build.yml"
-    branches:
-      - "**"
   workflow_call:
-  pull_request:
-
-env:
-  GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
 jobs:
+  test_miri:
+    name: Miri Unit Tests
+    uses: ./.github/workflows/test_miri.yml
   test:
-    name: Run Unit Tests
-    uses: ./.github/workflows/test.yml
-  build:
     name: ${{ matrix.platform.target }}
     runs-on: ${{ matrix.platform.runs-on }}
     strategy:
@@ -60,29 +48,10 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
-          fetch-depth: 0
-      - name: Build binary
+          fetch-depth: 1
+      - name: Run Tests
         uses: houseabsolute/actions-rust-cross@v1
         with:
-          command: "build"
+          command: "test"
           target: ${{ matrix.platform.target }}
-          args: "--locked --release"
-          strip: true
-      - name: Test binary
-        uses: houseabsolute/actions-rust-cross@v1
-        with:
-          command: "run"
-          target: ${{ matrix.platform.target }}
-          args: "--locked --release -- -bn 64 -i 3"
-      - name: Upload binary artifact
-        if: ${{ matrix.platform.runs-on != 'windows-latest' }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
-        with:
-          name: nanoda-${{ matrix.platform.target }}
-          path: target/${{ matrix.platform.target }}/release/nanoda
-      - name: Upload binary artifact
-        if: ${{ matrix.platform.runs-on == 'windows-latest' }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
-        with:
-          name: nanoda-${{ matrix.platform.target }}
-          path: target/${{ matrix.platform.target }}/release/nanoda.exe
+          args: "--locked --all-features --verbose"

@@ -1,6 +1,6 @@
 [package]
 name = "nanoda"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 authors.workspace = true
 repository.workspace = true
@@ -15,7 +15,7 @@ name = "nanoda"
 path = "src/main.rs"
 
 [dependencies]
-chase_seq = { version = "0.1.0", path = "../chase_seq" }
+chase_seq = { version = "0.2", path = "../chase_seq" }
 
 supershorty = "0.2.1"
 [build-dependencies]

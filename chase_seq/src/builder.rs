@@ -1,16 +1,16 @@
-use crate::{ChaseSeq, errors::ChaseSeqBuilderError};
+use crate::{ChaseSeq, ChaseSeqError, errors::ChaseSeqBuilderError};
 
 /// Builder for `ChaseSeq`.
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct ChaseSeqBuilder(ChaseSeq);
 
 impl ChaseSeqBuilder {
     /// Set the size in KiB of memory region to chase.
     pub fn size(mut self, size: usize) -> Result<Self, ChaseSeqBuilderError> {
-        if size == 0 {
-            return Err(ChaseSeqBuilderError::SizeIsZero);
-        }
-        _ = self.0.set_size(size);
+        self.0.set_size(size).map_err(|e| match e {
+            ChaseSeqError::CommonError(err) => ChaseSeqBuilderError::CommonError(err),
+            _ => unreachable!(),
+        })?;
         Ok(self)
     }
 
@@ -20,11 +20,14 @@ impl ChaseSeqBuilder {
         self
     }
 
+    /// Set the seed for random number generator.
+    pub fn seed(mut self, seed: &'static str) -> Self {
+        self.0.seed = seed;
+        self
+    }
+
     /// Build the `ChaseSeq`.
-    pub fn build(self) -> Result<ChaseSeq, ChaseSeqBuilderError> {
-        if self.0.size() == 0 {
-            return Err(ChaseSeqBuilderError::SizeIsZero);
-        }
-        Ok(self.0)
+    pub fn build(self) -> ChaseSeq {
+        self.0
     }
 }
