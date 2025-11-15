@@ -6,7 +6,7 @@ The name's inspired by the adorable catchphrase "nanoda(なのだ)" from **Zunda
 ## What's It Do?
 
 - Zips through memory with unsafe boxed slices for speedy allocation.
-- Uses clever permutations (tuned LCG for your pointer size) to chase data.
+- Uses clever permutations (tuned PRNG for your pointer size) to chase data.
 - Times each run in nanoseconds with `quanta::Clock`.
 - Tweak memory size (`-n` in MiB) and iterations (`-i`) to your heart's content.
 - Peek at build deets with the `-b` flag for reproducible fun.

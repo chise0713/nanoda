@@ -1,5 +1,6 @@
 [package]
 name = "chase_seq"
+# Change here and in lib.rs when releasing
 version = "0.2.0"
 edition = "2024"
 authors.workspace = true
