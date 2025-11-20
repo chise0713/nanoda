@@ -17,7 +17,7 @@ Use it in your code:
 use chase_seq::ChaseSeqBuilder;
 
 // `size` is in KiB
-let chase_seq = ChaseSeqBuilder::default().size(64 * 1024)?.fence(true).build()?;
+let chase_seq = ChaseSeqBuilder::default().size(64 * 1024)?.build()?;
 
 let results = chase_seq.chase(10);
 

@@ -8,7 +8,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! chase_seq = "0.1"
+//! chase_seq = "0.2"
 //! ```
 //!
 //! Use it in your code:
@@ -17,7 +17,7 @@
 //! use chase_seq::ChaseSeqBuilder;
 //!
 //! // `size` is in KiB
-//! let chase_seq = ChaseSeqBuilder::default().size(64 * 1024)?.fence(true).build()?;
+//! let chase_seq = ChaseSeqBuilder::default().size(64 * 1024)?.build()?;
 //!
 //! let results = chase_seq.chase(10);
 //!
@@ -127,7 +127,7 @@ impl ChaseSeq {
     /// Returns a boxed slice of `f64` representing the time taken (in nanoseconds) per pointer chase for each iteration.
     pub fn chase(&self, test_iterations: usize) -> Result<Box<[f64]>, ChaseSeqError> {
         _ = test_iterations
-            .checked_mul(PTR_SIZE)
+            .checked_mul(size_of::<f64>())
             .ok_or(ChaseSeqError::TestIterationsTooLarge)?;
         let mut results = Box::new_uninit_slice(test_iterations);
         let mut rng: Xoshiro256PlusPlus = Seeder::from(self.seed).into_rng();
