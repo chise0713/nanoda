@@ -4,8 +4,6 @@ on:
   push:
     tags-ignore: ["chase_seq-v*"]
 
-  workflow_call:
-
 jobs:
   build:
     name: Build Binaries
@@ -26,17 +24,20 @@ jobs:
           src_dir="${{ github.workspace }}/artifacts"
           out_dir="${{ github.workspace }}/out"
           mkdir -p "$out_dir"
-          find "$src_dir" -mindepth 1 -maxdepth 1 -type d ! -name "out" | while read -r dir; do
+          find "$src_dir" -mindepth 1 -maxdepth 1 -type d ! -name "$out_dir" | while read -r dir; do
               file=$(find "$dir" -maxdepth 1 -type f | head -n 1)
               [ -z "$file" ] && continue
               folder_name=$(basename "$dir")
               cp "$file" "$out_dir/${folder_name}"
               echo "copied $file → $out_dir/${folder_name}"
           done
+        shell: bash
       - name: Create release
-        if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'workflow_call'
-        uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2
-        with:
-          draft: true
-          generate_release_notes: true
-          files: ./out/*
+        if: github.ref_type == 'tag'
+        run: |
+          gh release create "${{ github.ref_name }}" \
+              --repo="${{ github.repository }}" \
+              --title="${{ github.ref_name }}" \
+              --generate-notes --draft \
+              ${{ github.workspace }}/out/*
+        shell: bash
