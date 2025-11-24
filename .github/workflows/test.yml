@@ -2,6 +2,9 @@ name: Unit Tests
 
 on:
   workflow_call:
+  push:
+    paths:
+      - ".github/workflows/test.yml"
 
 jobs:
   test_miri:
@@ -52,6 +55,7 @@ jobs:
       - name: Run Tests
         uses: houseabsolute/actions-rust-cross@v1
         with:
+          rust-cache-parameters: '{"prefix-key":"cross"}'
           command: "test"
           target: ${{ matrix.platform.target }}
-          args: "--locked --all-features --verbose"
+          args: "--all --locked --all-features --verbose"

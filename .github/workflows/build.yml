@@ -14,6 +14,7 @@ on:
 
 env:
   GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  BINARY_NAME: nanoda
 
 jobs:
   test:
@@ -64,6 +65,7 @@ jobs:
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v1
         with:
+          rust-cache-parameters: '{"prefix-key":"cross"}'
           command: "build"
           target: ${{ matrix.platform.target }}
           args: "--locked --release"
@@ -71,6 +73,7 @@ jobs:
       - name: Test binary
         uses: houseabsolute/actions-rust-cross@v1
         with:
+          use-rust-cache: false
           command: "run"
           target: ${{ matrix.platform.target }}
           args: "--locked --release -- -bn 64 -i 3"
@@ -78,11 +81,11 @@ jobs:
         if: ${{ matrix.platform.runs-on != 'windows-latest' }}
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
-          name: nanoda-${{ matrix.platform.target }}
-          path: target/${{ matrix.platform.target }}/release/nanoda
+          name: ${{ env.BINARY_NAME }}-${{ matrix.platform.target }}
+          path: target/${{ matrix.platform.target }}/release/${{ env.BINARY_NAME }}
       - name: Upload binary artifact
         if: ${{ matrix.platform.runs-on == 'windows-latest' }}
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
-          name: nanoda-${{ matrix.platform.target }}
-          path: target/${{ matrix.platform.target }}/release/nanoda.exe
+          name: ${{ env.BINARY_NAME }}-${{ matrix.platform.target }}
+          path: target/${{ matrix.platform.target }}/release/${{ env.BINARY_NAME }}.exe
