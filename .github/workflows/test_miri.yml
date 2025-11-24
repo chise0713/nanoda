@@ -21,4 +21,4 @@ jobs:
         run: |
           RUST_BACKTRACE=1 \
           MIRIFLAGS="-Zmiri-backtrace=full" \
-          cargo +nightly miri test --package chase_seq --locked --all-features
+          cargo +nightly miri test --all --package chase_seq --locked --all-features

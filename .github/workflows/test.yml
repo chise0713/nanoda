@@ -54,4 +54,4 @@ jobs:
         with:
           command: "test"
           target: ${{ matrix.platform.target }}
-          args: "--locked --all-features --verbose"
+          args: "--all --locked --all-features --verbose"
