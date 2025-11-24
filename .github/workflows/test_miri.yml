@@ -2,6 +2,9 @@ name: Miri Unit Tests
 
 on:
   workflow_call:
+  push:
+    paths:
+      - ".github/workflows/test_miri.yml"
 
 jobs:
   test:
