@@ -65,6 +65,7 @@ jobs:
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v1
         with:
+          rust-cache-parameters: '{"prefix-key":"cross"}'
           command: "build"
           target: ${{ matrix.platform.target }}
           args: "--locked --release"
@@ -72,6 +73,7 @@ jobs:
       - name: Test binary
         uses: houseabsolute/actions-rust-cross@v1
         with:
+          use-rust-cache: false
           command: "run"
           target: ${{ matrix.platform.target }}
           args: "--locked --release -- -bn 64 -i 3"
