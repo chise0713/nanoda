@@ -13,17 +13,18 @@
 //!
 //! Use it in your code:
 //!
-//! ```ignore
+//! ```no_run
 //! use chase_seq::ChaseSeqBuilder;
 //!
 //! // `size` is in KiB
-//! let chase_seq = ChaseSeqBuilder::default().size(64 * 1024)?.build()?;
+//! let chase_seq = ChaseSeqBuilder::default().size(64 * 1024)?.build();
 //!
-//! let results = chase_seq.chase(10);
+//! let results = chase_seq.chase(10)?;
 //!
 //! for (i, result) in results.iter().enumerate() {
 //!    println!("Iteration {}: {:.3} ns", i, result);
 //! }
+//! # Ok::<(), Box<dyn core::error::Error>>(())
 //! ```
 //!
 //!

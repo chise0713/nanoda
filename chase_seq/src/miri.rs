@@ -11,5 +11,5 @@ fn test_miri() {
     let chase_seq = builder.build();
     assert_eq!(chase_seq.size, 4 * crate::KB / crate::PTR_SIZE);
     assert_eq!(chase_seq.num_iter, 5);
-    assert!(chase_seq.chase(5).is_ok());
+    chase_seq.chase(5).unwrap();
 }
