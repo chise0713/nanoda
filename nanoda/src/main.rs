@@ -22,7 +22,7 @@ const MAX_REGION_SIZE: usize = 1024 * chase_seq::MB;
 struct Args {
     #[arg(flag = 'n', help = "used memory in `MiB`, minimum is `0.001` MiB")]
     memory_size: Option<f64>,
-    #[arg(flag = 'i', help = "test iterations")]
+    #[arg(flag = 'i', help = "test iterations, maximum is `65535`")]
     test_iterations: Option<u64>,
     #[arg(flag = 'b', help = "show build message")]
     build_info: bool,

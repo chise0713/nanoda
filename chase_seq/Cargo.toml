@@ -16,8 +16,8 @@ name = "chase_seq"
 path = "src/lib.rs"
 
 [dependencies]
-quanta = "0.12"
-rand_xoshiro = "0.7"
-rand_core = "0.9"
-rand_seeder = "0.4"
-thiserror = "2.0"
+quanta = "^0.12"
+rand_xoshiro = "^0.7"
+rand_core = "^0.9"
+rand_seeder = "^0.4"
+thiserror = "^2.0"
