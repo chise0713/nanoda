@@ -14,10 +14,10 @@
 //! Use it in your code:
 //!
 //! ```no_run
-//! use chase_seq::ChaseSeqBuilder;
+//! use chase_seq::{ChaseSeqBuilder, KB};
 //!
 //! // `size` is in KiB
-//! let chase_seq = ChaseSeqBuilder::default().size(64 * 1024)?.build();
+//! let chase_seq = ChaseSeqBuilder::default().size(64 * KB)?.build();
 //!
 //! let results = chase_seq.chase(10)?;
 //!
@@ -43,7 +43,7 @@ mod tests;
 use std::sync::OnceLock;
 use std::{
     hint,
-    sync::atomic::{Ordering, fence},
+    sync::atomic::{fence, Ordering},
 };
 
 #[cfg(not(miri))]
@@ -52,8 +52,10 @@ use rand_core::RngCore;
 use rand_seeder::Seeder;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
-pub use crate::builder::ChaseSeqBuilder;
-pub use crate::errors::{ChaseSeqBuilderError, ChaseSeqError, CommonError};
+pub use crate::{
+    builder::ChaseSeqBuilder,
+    errors::{ChaseSeqBuilderError, ChaseSeqError, CommonError},
+};
 
 /// Number of iterations for scaling.
 #[cfg(all(target_pointer_width = "64", not(miri)))]
@@ -61,10 +63,10 @@ const ITER: usize = 100_000_000;
 #[cfg(all(target_pointer_width = "32", not(miri)))]
 const ITER: usize = 50_000_000;
 
-/// From bytes, divide to get KiB
+/// From bytes, divide to get KiB.
 /// From KiB, multiply to get bytes
 pub const KB: usize = 1024;
-/// From bytes, divide to get MiB
+/// From bytes, divide to get MiB.
 /// From MiB, multiply to get bytes
 pub const MB: usize = 1024 * KB;
 

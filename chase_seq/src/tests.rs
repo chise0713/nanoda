@@ -59,7 +59,7 @@ fn test_copy_clone() {
         .seed("seed");
     let chase_seq1 = builder.build();
     let chase_seq2 = chase_seq1;
-    let chase_seq3 = chase_seq1.clone();
+    let chase_seq3 = chase_seq1;
     assert_eq!(chase_seq1.size(), chase_seq2.size());
     assert_eq!(chase_seq1.fence(), chase_seq3.fence());
     assert_eq!(chase_seq1.seed, chase_seq2.seed);
