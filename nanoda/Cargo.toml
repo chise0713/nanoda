@@ -16,7 +16,7 @@ path = "src/main.rs"
 
 [dependencies]
 chase_seq = { version = "^0.2", path = "../chase_seq" }
-supershorty = "^0.2.1"
+supershorty = "^0.2.4"
 
 [build-dependencies]
 vergen-git2 = { version = "^1.0.7", features = ["build", "cargo"] }
