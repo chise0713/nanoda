@@ -8,7 +8,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-chase_seq = "0.2"
+chase_seq = "^0.2"
 ```
 
 Use it in your code:
