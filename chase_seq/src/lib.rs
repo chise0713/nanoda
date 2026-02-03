@@ -8,7 +8,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! chase_seq = "0.2"
+//! chase_seq = "^0.2"
 //! ```
 //!
 //! Use it in your code:
@@ -43,12 +43,12 @@ mod tests;
 use std::sync::OnceLock;
 use std::{
     hint,
-    sync::atomic::{fence, Ordering},
+    sync::atomic::{Ordering, fence},
 };
 
 #[cfg(not(miri))]
 use quanta::Clock;
-use rand_core::RngCore;
+use rand_core::Rng;
 use rand_seeder::Seeder;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
@@ -196,17 +196,17 @@ impl Default for ChaseSeq {
 }
 
 #[cfg(target_pointer_width = "64")]
-fn rng_usize(rng: &mut impl RngCore) -> usize {
+fn rng_usize(rng: &mut impl Rng) -> usize {
     rng.next_u64() as usize
 }
 
 #[cfg(target_pointer_width = "32")]
-fn rng_usize(rng: &mut impl RngCore) -> usize {
+fn rng_usize(rng: &mut impl Rng) -> usize {
     rng.next_u32() as usize
 }
 
 // https://github.com/ChipsandCheese/MemoryLatencyTest/blob/a93bc1ba76dfe8cee76707e99f20ee13b5b485aa/src/memorylatency.c#L139-L146
-fn shuffle(data: &mut [usize], mut rng: &mut impl RngCore) {
+fn shuffle(data: &mut [usize], mut rng: &mut impl Rng) {
     let n = data.len();
     for iter in (1..n).rev() {
         let j = if iter == 1 {
