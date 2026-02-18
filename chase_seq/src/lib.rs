@@ -78,23 +78,20 @@ static CLOCK: OnceLock<Clock> = OnceLock::new();
 
 /// `ChaseSeq` provides pointer chasing benchmark functionality.
 #[derive(Clone, Copy)]
-pub struct ChaseSeq {
+pub struct ChaseSeq<'a> {
     size: usize,
     num_iter: usize,
-    seed: &'static str,
+    seed: &'a str,
     fence: bool,
 }
 
-impl ChaseSeq {
+impl<'a> ChaseSeq<'a> {
     /// Set the size in KiB of memory region to chase.
     pub fn set_size(&mut self, size: usize) -> Result<(), ChaseSeqError> {
         if size == 0 {
-            return Err(ChaseSeqError::CommonError(CommonError::SizeIsZero));
+            return Err(CommonError::SizeIsZero)?;
         };
-        self.size = size
-            .checked_mul(KB)
-            .ok_or(ChaseSeqError::CommonError(CommonError::SizeTooLarge))?
-            / PTR_SIZE;
+        self.size = size.checked_mul(KB).ok_or(CommonError::SizeTooLarge)? / PTR_SIZE;
         self.num_iter = scale_iterations(size);
         Ok(())
     }
@@ -115,13 +112,13 @@ impl ChaseSeq {
     }
 
     /// Set the seed string for random number generator.
-    pub fn set_seed(&mut self, seed: &'static str) {
+    pub fn set_seed(&mut self, seed: &'a str) {
         // Zero-length seed is allowed.
         self.seed = seed;
     }
 
     /// Get the seed string for random number generator.
-    pub fn seed(&self) -> &'static str {
+    pub fn seed(&self) -> &'a str {
         self.seed
     }
 
@@ -179,7 +176,7 @@ impl ChaseSeq {
     }
 }
 
-impl Default for ChaseSeq {
+impl<'a> Default for ChaseSeq<'a> {
     /// Create a default `ChaseSeq`.
     /// The default `size` is 2 KiB.
     /// The default `seed` is `"chase_seq_benchmark"`.

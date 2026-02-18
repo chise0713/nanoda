@@ -8,14 +8,22 @@ pub enum CommonError {
 
 #[derive(Debug, thiserror::Error)]
 pub enum ChaseSeqError {
-    #[error(transparent)]
-    CommonError(#[from] CommonError),
+    #[error("{}", .0)]
+    CommonError(
+        #[from]
+        #[source]
+        CommonError,
+    ),
     #[error("test_iterations is too large")]
     TestIterationsTooLarge,
 }
 
 #[derive(Debug, thiserror::Error)]
 pub enum ChaseSeqBuilderError {
-    #[error(transparent)]
-    CommonError(#[from] CommonError),
+    #[error("{}", .0)]
+    CommonError(
+        #[from]
+        #[source]
+        CommonError,
+    ),
 }
