@@ -6,10 +6,7 @@ package.authors = ["チセ <123655015+chise0713@users.noreply.github.com>"]
 package.repository = "https://github.com/chise0713/nanoda"
 package.readme = true
 
-# https://github.com/johnthagen/min-sized-rust/blob/f1db29c8cf2be1eaba1ee813cfd147a263853614/Cargo.toml#L9-L14
 [profile.release]
-opt-level = "z"   # Optimize for size.
-lto = true        # Enable Link Time Optimization
-codegen-units = 1 # Reduce number of codegen units to increase optimizations.
-panic = "abort"   # Abort on panic
-strip = true      # Automatically strip symbols from the binary.
+opt-level = 3
+lto = "fat"
+codegen-units = 1
